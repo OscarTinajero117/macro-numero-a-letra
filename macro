@@ -1,0 +1,232 @@
+Option Explicit
+
+'Main Function
+
+Function SpellNumber(ByVal MyNumber)
+
+Dim Dollars, Cents, Temp
+
+Dim DecimalPlace, Count
+
+ReDim Place(9) As String
+
+Place(2) = " MIL "
+
+Place(3) = " MILLÓN "
+
+Place(4) = " MIL MILLONES "
+
+Place(5) = " BILLÓN "
+
+' String representation of amount.
+
+MyNumber = Trim(Str(MyNumber))
+
+' Position of decimal place 0 if none.
+
+DecimalPlace = InStr(MyNumber, ".")
+
+' Convert cents and set MyNumber to dollar amount.
+
+If DecimalPlace > 0 Then
+
+Cents = GetTens(Left(Mid(MyNumber, DecimalPlace + 1) & "00", 2))
+
+MyNumber = Trim(Left(MyNumber, DecimalPlace - 1))
+
+End If
+
+Count = 1
+
+Do While MyNumber <> ""
+
+Temp = GetHundreds(Right(MyNumber, 3))
+
+If Temp <> "" Then Dollars = Temp & Place(Count) & Dollars
+
+If Len(MyNumber) > 3 Then
+
+MyNumber = Left(MyNumber, Len(MyNumber) - 3)
+
+Else
+
+MyNumber = ""
+
+End If
+
+Count = Count + 1
+
+Loop
+
+Select Case Dollars
+
+Case ""
+
+Dollars = ""
+
+Case "One"
+
+Dollars = "UNO"
+
+Case Else
+
+Dollars = Dollars & " "
+
+End Select
+
+Select Case Cents
+
+Case ""
+
+Cents = ""
+
+Case "One"
+
+Cents = " UNO"
+
+Case Else
+
+Cents = " PUNTO " & Cents & ""
+
+End Select
+
+SpellNumber = Dollars & Cents
+
+End Function
+
+
+' Converts a number from 100-999 into text
+
+Function GetHundreds(ByVal MyNumber)
+
+Dim Result As String
+
+If Val(MyNumber) = 0 Then Exit Function
+
+MyNumber = Right("000" & MyNumber, 3)
+
+' Convert the hundreds place.
+
+If Mid(MyNumber, 1, 1) <> "0" Then
+
+Result = GetDigit(Mid(MyNumber, 1, 1)) & " CIENTOS "
+
+End If
+
+' Convert the tens and ones place.
+
+If Mid(MyNumber, 2, 1) <> "0" Then
+
+Result = Result & GetTens(Mid(MyNumber, 2))
+
+Else
+
+Result = Result & GetDigit(Mid(MyNumber, 3))
+
+End If
+
+GetHundreds = Result
+
+End Function
+
+
+' Converts a number from 10 to 99 into text.
+
+
+Function GetTens(TensText)
+
+Dim Result As String
+
+Result = "" ' Null out the temporary function value.
+
+If Val(Left(TensText, 1)) = 1 Then ' If value between 10-19...
+
+Select Case Val(TensText)
+
+Case 10: Result = "DIEZ"
+
+Case 11: Result = "ONCE"
+
+Case 12: Result = "DOCE"
+
+Case 13: Result = "TRECE"
+
+Case 14: Result = "CATORCE"
+
+Case 15: Result = "QUINCE"
+
+Case 16: Result = "DIECISEIS"
+
+Case 17: Result = "DIECISIETE"
+
+Case 18: Result = "DIECIOCHO"
+
+Case 19: Result = "DIECINUEVE"
+
+Case Else
+
+End Select
+
+Else ' If value between 20-99...
+
+Select Case Val(Left(TensText, 1))
+
+Case 2: Result = "VEINTE "
+
+Case 3: Result = "TREINTA "
+
+Case 4: Result = "CUARENTA "
+
+Case 5: Result = "CINCUENTA "
+
+Case 6: Result = "SESENTA "
+
+Case 7: Result = "SETENTA "
+
+Case 8: Result = "OCHENTA "
+
+Case 9: Result = "NOVENTA "
+
+Case Else
+
+End Select
+
+Result = Result & GetDigit(Right(TensText, 1))  ' Retrieve ones place.
+
+End If
+
+GetTens = Result
+
+End Function
+
+
+' Converts a number from 1 to 9 into text.
+
+Function GetDigit(Digit)
+
+Select Case Val(Digit)
+
+Case 1: GetDigit = "UNO"
+
+Case 2: GetDigit = "DOS"
+
+Case 3: GetDigit = "TRES"
+
+Case 4: GetDigit = "CUATRO"
+
+Case 5: GetDigit = "CINCO"
+
+Case 6: GetDigit = "SEIS"
+
+Case 7: GetDigit = "SIETE"
+
+Case 8: GetDigit = "OCHO"
+
+Case 9: GetDigit = "NUEVE"
+
+Case Else: GetDigit = ""
+
+End Select
+
+End Function
+
